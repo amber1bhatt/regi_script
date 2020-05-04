@@ -1,5 +1,7 @@
 import requests
 from html.parser import HTMLParser
+import smtplib
+from email.message import EmailMessage
 
 # payload={'sesscd': input("Term (S=summer, W=winter): "),
 #          'pname': 'subjarea', 'tname': 'subj-section',
@@ -18,6 +20,7 @@ class MyHTMLParser(HTMLParser):
     print_flag = False
     seat_data = []
     seat_data_dict = {}
+    availability = "Limbo"
     # def handle_starttag(self, tag, attrs):
     #     print("Start tag:", tag)
     #     for attr in attrs:
@@ -48,14 +51,32 @@ class MyHTMLParser(HTMLParser):
     def check_data(self):
         if int(MyHTMLParser.seat_data_dict["General Seats Remaining:"]) > 0:
             print("SEAT OPEN")
+            availability = "SEAT OPEN"
         else:
             print("The Big Sad")
+            availability = "The Big Sad"
+
+    # FROM = 'amberb220@gmail.com'
+    # TO = 'amberb220@gmail.com'
+    # SUBJECT = availability
+    # TEXT = "Yeet"
+    # message = """\
+    # FROM: %s
+    # TO: %s
+    # SUBJECT: %s
+    #
+    # %s
+    # """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
+    # server = smtplib.SMTP('')
+
+
 
 parser = MyHTMLParser()
 parser.feed(r.text)
 
 parser.clean_seat_data()
 parser.check_data()
+
 
 print(parser.seat_data)
 print(parser.seat_data_dict)
