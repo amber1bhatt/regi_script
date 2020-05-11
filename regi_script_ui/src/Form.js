@@ -1,5 +1,16 @@
 import React from 'react';
 
+
+
+var emailCheck = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/
+
+function validate(email) {
+  return {
+    email: !emailCheck.test(email)
+    // email: email.length <= 4
+  };
+}
+
 export default class Form extends React.Component {
   state = {
     firstname: '',
@@ -8,15 +19,37 @@ export default class Form extends React.Component {
     year: '',
     course: '',
     section: '',
-    department: ''
+    department: '',
+    errors: {
+      email: true
+    }
+  }
 
+  handleEmailChange = e => {
+    this.setState({email: e.target.value});
+  }
+
+  handleSubmit = e => {
+    if(!this.canBeSubmitted) {
+      e.preventDefault();
+      return;
+    }
+    const {email} = this.state;
+  }
+
+  canBeSubmitted() {
+    const errors = validate(this.state.email);
+    const isDisabled = Object.keys(errors).some(x => errors[x]);
+    return !isDisabled;
   }
 
   change = e => {
     this.setState({
       [e.target.name]: e.target.value
     });
+
   };
+
 
   onSubmit = e => {
     e.preventDefault();
@@ -33,7 +66,14 @@ export default class Form extends React.Component {
     });
   };
 
+
+
+
+
   render() {
+
+    const errors = validate(this.state.email);
+    const isDisabled = Object.keys(errors).some(x => errors[x]);
 
     const styles = {
       transform: 'translate(0px, 35vh)',
@@ -54,7 +94,7 @@ export default class Form extends React.Component {
     }
 
     return (
-      <form style={styles}>
+      <form onSubmit={this.handleSubmit} style={styles}>
         <input
         style={inputStyle}
         name="firstname"
@@ -63,11 +103,12 @@ export default class Form extends React.Component {
         onChange={e=>this.change(e)}
         />
         <input
+        className={errors.email ? "error" : ""}
         style={inputStyle}
         name="email"
         placeholder='Email'
         value={this.state.email}
-        onChange={e=>this.change(e)}
+        onChange={this.handleEmailChange}
         />
         <br/>
         <input
@@ -109,7 +150,7 @@ export default class Form extends React.Component {
         <br/>
         <br/>
 
-        <button style={buttonStyle} onClick={e => this.onSubmit(e)}>Submit</button>
+        <button disabled={isDisabled} style={buttonStyle} onClick={e => this.onSubmit(e)}>Submit</button>
 
       </form>
     )
